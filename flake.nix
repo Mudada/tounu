@@ -24,7 +24,10 @@
 	cabal-install
       ];
     in
-      pkgs.myHaskellPackages.myProject.env.overrideAttrs (oldEnv: {
-	mkShell = { nativeBuildInputs = myDevTools; };
-      });
+    {
+      devShells.${system}.default = 
+	pkgs.mkShell {
+	  packages = myDevTools; 
+	};
+    };
 }

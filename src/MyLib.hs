@@ -1,7 +1,6 @@
-import Data.Map.Lazy
-
 module MyLib () where
 
+import Data.Map.Lazy
 
 -- def $name [ $arg_name: $arg_type ] -> $return_type { $body }
 data Body = Body String
@@ -41,7 +40,7 @@ data Type =
 data Argument = Argument String String
 data Function = Function String [Argument] Type Body
 
-generateFunction :: Function -> String
-generateFunction (Function name args (Type returnType) (Body body)) =
-  "def " ++ name ++ " [" ++ (mconcat $ argToStr <$> args) ++ "] " ++ "->" ++ returnType ++ "{" ++ body ++ "}"
-  where argToStr (Argument n t) = n ++ ": " ++ t
+-- generateFunction :: Function -> String
+-- generateFunction (Function name args (Type returnType) (Body body)) =
+--   "def " ++ name ++ " [" ++ (mconcat $ argToStr <$> args) ++ "] " ++ "->" ++ returnType ++ "{" ++ body ++ "}"
+--   where argToStr (Argument n t) = n ++ ": " ++ t
