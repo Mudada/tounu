@@ -1,9 +1,14 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
 module MyLib () where
 
-import Data.Map.Lazy
+import Data.Proxy
+import Data.Map (singleton, Map(..))
 
--- def $name [ $arg_name: $arg_type ] -> $return_type { $body }
-data Body = Body String
 data FileSizeUnit = 
   B 
   | KB 
@@ -19,28 +24,41 @@ data FileSizeUnit =
   | PIB 
   | EIB
   deriving (Show)
-data Type =
-  Any 
-  | Bool Bool
-  | Int Int
-  | Float Float
-  | Filesize Int FileSizeUnit
-  | Duration String 
-  | Date String
-  | Range String
-  | String String
-  | Record (Map String Type)
-  | List 
-  | Table 
-  | Closure 
-  | Nothing 
-  | Binary 
-  | Glob 
-  | CellPath
-data Argument = Argument String String
-data Function = Function String [Argument] Type Body
 
--- generateFunction :: Function -> String
--- generateFunction (Function name args (Type returnType) (Body body)) =
---   "def " ++ name ++ " [" ++ (mconcat $ argToStr <$> args) ++ "] " ++ "->" ++ returnType ++ "{" ++ body ++ "}"
---   where argToStr (Argument n t) = n ++ ": " ++ t
+data NuType =
+  NuAny 
+  | NuBool
+  | NuInt
+  | NuFloat
+  | NuFilesize
+  | NuDuration
+  | NuDate
+  | NuRange
+  | NuString
+  | forall (k :: NuType). NuRecord (Map String (Proxy k))
+  | forall (k :: NuType). NuList (Proxy k) 
+  | NuClosure 
+  | NuNothing 
+  | NuBinary 
+  | NuGlob 
+  | NuCellPath
+
+list :: NuType
+list = NuList (Proxy :: Proxy 'NuInt)
+
+record :: NuType
+record = NuRecord (singleton "a" (Proxy :: Proxy 'NuInt))
+
+table :: NuType
+table = NuList (Proxy :: Proxy ('NuRecord (Map String (Proxy NuInt))))
+
+
+deriving instance Show NuType
+
+  --{ 
+  -- Nushell expected results
+  --
+  -- Function
+  -- def $name [ $arg_name: $arg_type ] -> $return_type { $body }
+  --}
+
